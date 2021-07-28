@@ -1,5 +1,6 @@
 package com.jcrawley.reactivebeerclient.client;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,17 @@ public class BeerClientImpl implements BeerClient {
 	@Override
 	public Mono<BeerPagedList> listBeers(Integer pageNumber, Integer pageSize, String beerName, String beerStyle,
 			boolean showInventoryOnhand) {
-		return webClient.get().uri(WebClientProperties.BEER_V1_PATH)
-		.retrieve().bodyToMono(BeerPagedList.class);
+		
+		return webClient.get()
+				.uri(uriBuilder -> uriBuilder.path(WebClientProperties.BEER_V1_PATH)
+						.queryParamIfPresent("pageNumber",  Optional.ofNullable(pageNumber))
+						.queryParamIfPresent("pageSize",  Optional.ofNullable(pageSize))
+						.queryParamIfPresent("beerName",  Optional.ofNullable(beerName))
+						.queryParamIfPresent("beerStyle", Optional.ofNullable(beerStyle))
+						.queryParamIfPresent("showInvnetoryOnhand", Optional.ofNullable(showInventoryOnhand))
+						.build()
+						)
+				.retrieve().bodyToMono(BeerPagedList.class);
 	
 	}
 

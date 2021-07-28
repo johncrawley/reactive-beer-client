@@ -34,6 +34,28 @@ public class BeerClientImplTests {
 	
 	
 	@Test
+	void listBeersPageSize10() {
+		Mono<BeerPagedList> beerPagedListMono = beerClient.listBeers(1, 10, null, null, false);
+	
+		BeerPagedList pagedList = beerPagedListMono.block();
+		assertThat(pagedList).isNotNull();
+		assertThat(pagedList.getContent().size()).isEqualTo(10);
+	}
+	
+	
+	@Test
+	void listBeersNoRecords() {
+		// if we go to page 10 and list 20, we know there will be no records currently
+		Mono<BeerPagedList> beerPagedListMono = beerClient.listBeers(10, 20, null, null, false);
+	
+		BeerPagedList pagedList = beerPagedListMono.block();
+		assertThat(pagedList).isNotNull();
+		assertThat(pagedList.getContent().size()).isEqualTo(0);
+	}
+	
+	
+	
+	@Test
 	void getBeerById() {
 		
 	}
