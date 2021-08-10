@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public interface BeerClient {
 
 	
-	Mono<BeerDto> getBeerById(UUID id);
+	Mono<BeerDto> getBeerById(UUID id, boolean showInventoryOnHand);
 	Mono<BeerPagedList> listBeers(Integer pageNumber, Integer pageSize, 
 			String beerName, String beerStyle, boolean showInventoryOnhand);
 	Mono<ResponseEntity<BeerDto>> createBeer(BeerDto beerDto);

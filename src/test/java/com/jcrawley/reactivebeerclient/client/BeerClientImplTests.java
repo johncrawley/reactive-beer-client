@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.jcrawley.reactivebeerclient.config.WebClientConfig;
+import com.jcrawley.reactivebeerclient.model.BeerDto;
 import com.jcrawley.reactivebeerclient.model.BeerPagedList;
 
 import reactor.core.publisher.Mono;
@@ -53,11 +54,36 @@ public class BeerClientImplTests {
 		assertThat(pagedList.getContent().size()).isEqualTo(0);
 	}
 	
+
+	@Test
+	void getBeerById() {
+		Mono<BeerPagedList> beerList = beerClient.listBeers(1, 4, null, null, false);
+		BeerDto beerFromList = beerList.block().get().findFirst().get();
+		Mono<BeerDto> beerById = beerClient.getBeerById(beerFromList.getId(), false);
+		BeerDto retrievedBeer = beerById.block();
+		assertThat(retrievedBeer.getId()).isEqualTo(beerFromList.getId());	
+		assertThat(retrievedBeer.getQuantityOnHand()).isNull();	
+	}
+
+	
+	@Test
+	void getBeerByIdAndShowQuantityOnHand() {
+		Mono<BeerPagedList> beerList = beerClient.listBeers(1, 4, null, null, false);
+		BeerDto beerFromList = beerList.block().get().findFirst().get();
+		Mono<BeerDto> beerById = beerClient.getBeerById(beerFromList.getId(), true);
+		BeerDto retrievedBeer = beerById.block();
+		assertThat(retrievedBeer.getId()).isEqualTo(beerFromList.getId());	
+		assertThat(retrievedBeer.getQuantityOnHand()).isNotNull();	
+	}
 	
 	
 	@Test
-	void getBeerById() {
-		
+	void getBeerByUpc() {
+		Mono<BeerPagedList> beerList = beerClient.listBeers(1, 4, null, null, false);
+		BeerDto beerFromList = beerList.block().get().findFirst().get();
+		Mono<BeerDto> beerById = beerClient.getBeerByUPC(beerFromList.getUpc());
+		BeerDto retrievedBeer = beerById.block();
+		assertThat(retrievedBeer.getId()).isEqualTo(beerFromList.getId());	
 	}
 	
 	

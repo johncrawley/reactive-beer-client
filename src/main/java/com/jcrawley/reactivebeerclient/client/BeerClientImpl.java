@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 
 import com.jcrawley.reactivebeerclient.config.WebClientProperties;
 import com.jcrawley.reactivebeerclient.model.BeerDto;
@@ -22,9 +23,13 @@ public class BeerClientImpl implements BeerClient {
 	
 	
 	@Override
-	public Mono<BeerDto> getBeerById(UUID id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Mono<BeerDto> getBeerById(UUID id, boolean showInventoryOnHand) {
+		return webClient.get()
+				.uri(uriBuilder -> uriBuilder.path(WebClientProperties.BEER_V1_PATH + "/" + id.toString())
+						.queryParamIfPresent("showInventoryOnHand", Optional.ofNullable(showInventoryOnHand))
+						.build()
+						)
+				.retrieve().bodyToMono(BeerDto.class);
 	}
 
 	@Override
@@ -62,10 +67,13 @@ public class BeerClientImpl implements BeerClient {
 		return null;
 	}
 
+	
 	@Override
 	public Mono<BeerDto> getBeerByUPC(String upc) {
-		// TODO Auto-generated method stub
-		return null;
+		return webClient.get()
+		.uri(uriBuilder -> uriBuilder.path(WebClientProperties.BEER_V1_PATH_UPC + "/" + upc).build())
+				.retrieve()
+				.bodyToMono(BeerDto.class);
 	}
 
 }
