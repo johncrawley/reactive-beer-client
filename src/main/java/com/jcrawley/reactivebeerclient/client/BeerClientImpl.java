@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 
@@ -25,12 +26,13 @@ public class BeerClientImpl implements BeerClient {
 	@Override
 	public Mono<BeerDto> getBeerById(UUID id, boolean showInventoryOnHand) {
 		return webClient.get()
-				.uri(uriBuilder -> uriBuilder.path(WebClientProperties.BEER_V1_PATH + "/" + id.toString())
+				.uri(uriBuilder -> uriBuilder.path(WebClientProperties.BEER_V1_PATH_GET_BY_ID)
 						.queryParamIfPresent("showInventoryOnHand", Optional.ofNullable(showInventoryOnHand))
-						.build()
+						.build(id)
 						)
 				.retrieve().bodyToMono(BeerDto.class);
 	}
+	
 
 	@Override
 	public Mono<BeerPagedList> listBeers(Integer pageNumber, Integer pageSize, String beerName, String beerStyle,
@@ -50,21 +52,32 @@ public class BeerClientImpl implements BeerClient {
 	}
 
 	@Override
-	public Mono<ResponseEntity<BeerDto>> createBeer(BeerDto beerDto) {
-		// TODO Auto-generated method stub
-		return null;
+	public Mono<ResponseEntity<Void>> createBeer(BeerDto beerDto) {
+		return webClient.post()
+				.uri(uriBuilder -> uriBuilder.path(WebClientProperties.BEER_V1_PATH).build())
+				.body(BodyInserters.fromValue(beerDto))
+				.retrieve()
+				.toBodilessEntity();
 	}
 
 	@Override
-	public Mono<ResponseEntity<BeerDto>> updateBeer(BeerDto beerDto) {
-		// TODO Auto-generated method stub
-		return null;
+	public Mono<ResponseEntity<Void>> updateBeer(UUID beerId, BeerDto beerDto) {
+		return webClient.put()
+		.uri(uriBuilder -> uriBuilder.path(WebClientProperties.BEER_V1_PATH_GET_BY_ID)
+				.build(beerId))
+				.body(BodyInserters.fromValue(beerDto))
+				.retrieve()
+				.toBodilessEntity();
 	}
 
 	@Override
-	public Mono<ResponseEntity<BeerDto>> deleteBeer(BeerDto beerDto) {
-		// TODO Auto-generated method stub
-		return null;
+	public Mono<ResponseEntity<Void>> deleteBeer(BeerDto beerDto) {
+		
+		return webClient.delete()
+				.uri(uriBuilder -> uriBuilder.path(WebClientProperties.BEER_V1_PATH_GET_BY_ID)
+						.build(beerDto.getId()))
+						.retrieve()
+						.toBodilessEntity();
 	}
 
 	

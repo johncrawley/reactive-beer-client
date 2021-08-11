@@ -15,9 +15,9 @@ public interface BeerClient {
 	Mono<BeerDto> getBeerById(UUID id, boolean showInventoryOnHand);
 	Mono<BeerPagedList> listBeers(Integer pageNumber, Integer pageSize, 
 			String beerName, String beerStyle, boolean showInventoryOnhand);
-	Mono<ResponseEntity<BeerDto>> createBeer(BeerDto beerDto);
-	Mono<ResponseEntity<BeerDto>> updateBeer(BeerDto beerDto);
-	Mono<ResponseEntity<BeerDto>> deleteBeer(BeerDto beerDto);
+	Mono<ResponseEntity<Void>> createBeer(BeerDto beerDto);
+	Mono<ResponseEntity<Void>> updateBeer(UUID beerId, BeerDto beerDto);
+	Mono<ResponseEntity<Void>> deleteBeer(BeerDto beerDto);
 	Mono<BeerDto> getBeerByUPC(String upc);
 	
 }

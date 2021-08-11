@@ -1,5 +1,6 @@
 package com.jcrawley.reactivebeerclient.model;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ public class BeerDto {
 	@NotBlank
 	private String beerStyle;
 	private String upc;
-	private String price;
+	private BigDecimal price;
 	private int quantityOnHand;
 	private int version;
 	private OffsetDateTime createdDate;
