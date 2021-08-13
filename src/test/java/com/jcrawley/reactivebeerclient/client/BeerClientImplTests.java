@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -126,6 +128,7 @@ public class BeerClientImplTests {
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 	}
 	
+	
 	private BeerDto getFirstBeer() {
 		Mono<BeerPagedList> beerList = beerClient.listBeers(1, 4, null, null, false);
 		BeerDto beerFromList = beerList.block().get().findFirst().get();
@@ -142,6 +145,7 @@ public class BeerClientImplTests {
 		assertThat(responseEntityMono.block().getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 	
+	
 	@Test
 	void deleteBeerByIdNotFound() {
 		BeerDto beer = getFirstBeer();
@@ -154,6 +158,7 @@ public class BeerClientImplTests {
 		
 		//assertThat(responseEntityMono.block().getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
+	
 	
 	/*
 	 * 
@@ -180,8 +185,22 @@ public class BeerClientImplTests {
 	}
 
 	
+
 	@Test
-	void getBeerByUPC() {
-		
+	void functionalTestGetBeerById() throws InterruptedException {
+		AtomicReference<String> beerName = new AtomicReference<>();
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+		beerClient.listBeers(null, null, null, null, false)
+		.map(beerPagedList -> beerPagedList.getContent().get(0).getId())
+		.map(beerId -> beerClient.getBeerById(beerId, false))
+				.flatMap(mono -> mono)
+				.subscribe(beerDto -> {
+					beerName.set(beerDto.getBeerName());
+					System.out.println("**** beerName: " + beerDto.getBeerName());
+					countDownLatch.countDown();
+				});
+		countDownLatch.await();
+		assertThat(beerName.get()).isEqualTo("Mango Bobs");
 	}
+	
 }
